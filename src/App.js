@@ -30,13 +30,13 @@ class App extends Component {
     if (nextContacts !== prevContacts) {
       localStorage.setItem('contacts', JSON.stringify(nextContacts));
     }
-
-    if (
-      nextContacts.length > prevContacts.length &&
-      prevContacts.length !== 0
-    ) {
-      this.toggleModal();
-    }
+    // не работает при добавлении первого контакта ?????
+    // if (
+    //   nextContacts.length > prevContacts.length &&
+    //   prevContacts.length !== 0
+    // ) {
+    //   this.toggleModal();
+    // }
   }
 
   formSubmitHandler = data => {
@@ -44,7 +44,7 @@ class App extends Component {
       id: nanoid(),
       ...data,
     };
-
+    this.toggleModal();
     const contactNames = this.state.contacts.map(elem =>
       elem.name.toLowerCase(),
     );
