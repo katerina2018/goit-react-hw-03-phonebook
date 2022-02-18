@@ -18,6 +18,7 @@ class Form extends Component {
     event.preventDefault();
     this.props.onSubmit(this.state);
     this.reset();
+    this.props.onResetFilter();
   };
 
   reset = () => {
@@ -36,6 +37,7 @@ class Form extends Component {
             title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
             required
             autoComplete="off"
+            autoFocus="on"
             value={this.state.name}
             onChange={this.handleChange}
           />

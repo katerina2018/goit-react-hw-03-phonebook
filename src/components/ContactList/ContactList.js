@@ -1,27 +1,25 @@
 import React from 'react';
+import propTypes from 'prop-types';
+import Contact from '../Contact/Contact';
 
-import { HiOutlineUser, HiOutlinePhone, HiMinusCircle } from 'react-icons/hi';
+import { ContactItems, ContactItem } from './ContactList.styles';
 
-import {
-  ContactItems,
-  ContactItem,
-  ContactListButton,
-} from './ContactList.styles';
+const ContactList = ({ value, onDeleteContant }) => (
+  <ContactItems>
+    {value.map(({ id, name, number }) => (
+      <ContactItem key={id} id={id}>
+        <Contact
+          name={name}
+          number={number}
+          onDeleteContant={() => onDeleteContant(id)}
+        />
+      </ContactItem>
+    ))}
+  </ContactItems>
+);
 
-const ContactList = ({ value, onDeleteContant }) => {
-  return (
-    <ContactItems>
-      {value.map(({ id, name, number }) => (
-        <ContactItem key={id} id={id}>
-          {<HiOutlineUser />}
-          {name}: {number}
-          <ContactListButton type="button" onClick={() => onDeleteContant(id)}>
-            Delete {<HiMinusCircle />}
-          </ContactListButton>
-        </ContactItem>
-      ))}
-    </ContactItems>
-  );
+ContactList.propTypes = {
+  value: propTypes.array,
 };
 
 export default ContactList;

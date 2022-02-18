@@ -5,17 +5,39 @@ import Section from './components/Section';
 import Form from './components/Form';
 import Filter from './components/Filter';
 import ContactList from './components/ContactList';
+import IconButton from './components/IconButton';
+import { ReactComponent as AddIcon } from './icons/person_add_icon.svg';
+import Modal from './components/Modal';
 
 class App extends Component {
   state = {
-    contacts: [
-      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-    ],
+    contacts: [],
     filter: '',
+    showModal: false,
   };
+  componentDidMount() {
+    const contacts = localStorage.getItem('contacts');
+    const parsedContacts = JSON.parse(contacts);
+    if (parsedContacts) {
+      this.setState({ contacts: parsedContacts });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const nextContacts = this.state.contacts;
+    const prevContacts = prevState.contacts;
+
+    if (nextContacts !== prevContacts) {
+      localStorage.setItem('contacts', JSON.stringify(nextContacts));
+    }
+
+    if (
+      nextContacts.length > prevContacts.length &&
+      prevContacts.length !== 0
+    ) {
+      this.toggleModal();
+    }
+  }
 
   formSubmitHandler = data => {
     const contact = {
@@ -38,12 +60,23 @@ class App extends Component {
     this.setState({ filter: event.currentTarget.value });
   };
 
+  resetFilter = () => {
+    this.setState({ filter: '' });
+  };
   getVisibleContact = () => {
     const { filter, contacts } = this.state;
     const normalizeFilter = filter.toLowerCase();
-    return contacts.filter(contact =>
+    const allContacts = contacts.filter(contact =>
       contact.name.toLowerCase().includes(normalizeFilter),
     );
+
+    const inAlphabetContact = [
+      ...allContacts.sort((firstContact, secondContact) =>
+        firstContact.name.localeCompare(secondContact.name),
+      ),
+    ];
+
+    return inAlphabetContact;
   };
 
   deleteContant = id => {
@@ -52,17 +85,38 @@ class App extends Component {
     }));
   };
 
+  toggleModal = () => {
+    this.setState(({ showModal }) => ({
+      showModal: !showModal,
+    }));
+  };
+
   render() {
+    const { showModal } = this.state;
     const visibleName = this.getVisibleContact();
 
     return (
       <Section>
         <h1 className="App">Phonebook</h1>
+        <IconButton
+          onClick={this.toggleModal}
+          aria-label="Open modal"
+          style={{ display: 'flex', marginLeft: 'auto' }}
+        >
+          <AddIcon width="40" height="40" />
+        </IconButton>
 
-        <Form onSubmit={this.formSubmitHandler} />
+        {showModal && (
+          <Modal onClose={this.toggleModal}>
+            <Form
+              onSubmit={this.formSubmitHandler}
+              onResetFilter={this.resetFilter}
+            />
+          </Modal>
+        )}
 
-        <h2 className="App">Contacts</h2>
         <Filter value={this.state.filter} onChange={this.changeFilter} />
+
         <ContactList value={visibleName} onDeleteContant={this.deleteContant} />
       </Section>
     );
